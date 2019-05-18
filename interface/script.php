@@ -1,13 +1,113 @@
-<?php include 'head.php'; ?>
-
-<body>
-	<?php 
+<?php
+		//include 'login.php';
+		require 'db_con.php';
+		include 'head.php'; 
 		include 'navbar-top.php';
 	 	include 'nav-side-menu.php'; 
-		extract($_GET);
-	?>
+	 	include 'func-robot.php';
+		
+		$cmd = $_GET['cmd'];
+		$ID = (int) $_GET['ID'];
+		
+		if($cmd == "delete"){
+			$sql = "SELECT script_title FROM scripts WHERE ID='$ID'";
+			$res = mysqli_query($conn, $sql);
+			if($res) $row = mysqli_fetch_assoc($res);
+			else echo mysqli_error($conn);
+			$filename = $row['script_title'];
+			
+			$sql = "DELETE FROM scripts WHERE ID='$ID'";
+			$res = mysqli_query($conn, $sql);
+			$delStatus = unlink($saved_scripts_dir.$filename);
+			
+			if($res AND $delStatus) {
+				$cmd = "";
+				$delFlag = true;
+			}
+		}
+		
+		if($cmd == "exsavescript"){
+			echo "<script>$( document ).ready(function() {"  
+				."$('#mainForm').submit();" .
+				"});" .
+				"</script>";
+			$exsaveFlag = true;
+			$cmd = "save";
+		}
+		
+		if($cmd == "save"){
+			$scriptTitle = $_POST['scriptName'];
+			$scriptCode = $_POST['code'];
+			
+			if($ID > 0){
+				$sql = "SELECT script_title FROM scripts WHERE ID='$ID'";
+				$row=mysqli_fetch_assoc(mysqli_query($conn, $sql));
+				$res = true;
+				
+				if($row['script_title'] != $scriptTitle){
+					$sql = "UPDATE scripts SET script_title='$scriptTitle', last_modified=NOW() WHERE ID='$ID'";
+					$res = mysqli_query($conn, $sql);
+					unlink($saved_scripts_dir.$row['script_title']);
+				}
+				else{
+					$sql = "UPDATE scripts SET last_modified=NOW() WHERE ID='$ID'";
+					$res = mysqli_query($conn, $sql);
+				}
+				
+				$written = file_put_contents($saved_scripts_dir.$scriptTitle, stripslashes($scriptCode));
+				
+				//if($res AND $written) echo "<script>alert(\"Script was edited succesfully.\");</script>";
+				if(!$res OR !$written) echo "<script>alert(\"An ERROR occured.\");</script>";
+				if($_POST['stayOnPage']) $cmd="edit";
+				else $cmd = "";
+			}
+			elseif($ID == 0){
+				$sql = "SELECT ID FROM operators WHERE cookie='$_COOKIE[userID]' LIMIT 1";
+				$res = mysqli_query($conn, $sql);
+				$record= mysqli_fetch_assoc($res);
+				$user_ID = $record['ID'];
+				$sql = "INSERT INTO scripts SET script_title='$scriptTitle', create_date=NOW(), operator_ID='$user_ID'";
+				$res = mysqli_query($conn, $sql);
+				$written = file_put_contents($saved_scripts_dir.$scriptTitle, stripslashes($scriptCode));
+				//if($res AND $written) echo "<script>alert(\"New script was created succesfully.\");</script>";
+				//else  echo "<script>alert(\"An ERROR occured.\");</script>";
+				$cmd="";
+			}
+			if(isset($_POST['executeSaveBtn'])){
+				$cmd="execscript";
+			}
+		}
+		
+		if($cmd == "execscript"){
+			if($ID > 0)
+			{
+				$sql = "SELECT script_title FROM scripts WHERE ID=$ID";
+				$res = mysqli_query($conn, $sql);
+				$row = mysqli_fetch_assoc($res);
+				$code = file_get_contents($saved_scripts_dir.$row['script_title']);
+				$sql = "UPDATE scripts SET last_executed=NOW() WHERE ID=$ID";
+				$res = mysqli_query($conn, $sql);
+				$out = eval($code);
+				echo $out;
+				$cmd="execute";
+			}
+		}
+		
+		if($cmd == "edit" || $cmd == "create" || $cmd == "execute"){
+			if($ID > 0){
+				$sql = "SELECT * FROM scripts WHERE ID=$ID LIMIT 1";
+				$res = mysqli_query($conn, $sql);
+				$row = mysqli_fetch_assoc($res);
+				$filename = $row['script_title'];
+				$filePath = $saved_scripts_dir . $filename;
+				$file = file_get_contents($filePath);
+			}
+			elseif($ID == 0){
+				$filename="";
+				$file = "";
+			} ?>
 	
-	<div class="content col-lg-10">
+			<div class="content col-lg-10">
 				<article>
 					<div class="content-header">
 						<header>
@@ -24,14 +124,11 @@
 								</div>
 						</div>
 						
-						<div id="alertsuccess" class="alert alert-success" role="alert" style="display: none;">
-		  					New script was created successfully!
-						</div>
 						<div id="alerterror" class="alert alert-danger" role="alert" style="display: none;">
 		  					Unexpected error!
 						</div>
 						
-						<form id="mainForm" action="file_processing.php">
+						<form id="mainForm" action="script.php?cmd=save&ID=<?=$ID?>" method="POST">
 							
 						  <div class="form-group">
 						  	<div class="container">
@@ -40,7 +137,7 @@
 								</div>
 						    	<div class="row">
 						    		<div class="col-lg-6">
-						    			 <input type="text" class="form-control" id="script_name" placeholder="Script name" name="filename" value="<?php echo "$filename";?>">
+						    			 <input type="text" class="form-control" id="script_name" placeholder="Script name" name="scriptName" value="<?=$filename;?>">
 						    		</div>
 						    	</div>
 						    </div>
@@ -53,12 +150,7 @@
 						    	</div>
 						    	<div class="row">
 						    		<div class="col-lg-8">
-						    			<textarea class="form-control" id="editor" name="code" value="">
-						    				<?php 
-						    					if($filename != "")
-						    						echo readfile($saved_scripts_dir . $filename);
-						    				?>
-						    			</textarea>	
+						    			<textarea class="form-control" id="editor" name="code"><?=$file;?></textarea>	
 						    		</div>
 						    	</div>
 						    	<div class="row" style="margin-top: 30px;">
@@ -66,10 +158,32 @@
 						    		</div>
 						    	</div>
 						  	</div>
-						</div>
-						  
-						 <input id="cmdPostParam" type="hidden" name="command" value="">
-						
+							</div>
+							<?php 
+								if($cmd == "edit"){ ?>
+									<div class="form-check custom-checkbox">
+							      <label class="form-check-label" for="check1">
+							        <input type="checkbox" class="form-check-input" id="check1" name="stayOnPage" checked> Stay on page after save
+							      </label>
+							    </div>
+									<?php
+								}
+							if($cmd != "execute") 
+								echo "<button type=\"submit\" class=\"btn btn-info btn-lg\" name=\"saveBtn\" id=\"saveBtn\" style=\"margin-right: 10px;\">Save code</button>";
+							else {
+								echo "<a href=\"script.php?cmd=execscript&ID=$ID\"><button type=\"button\" class=\"btn btn-info btn-lg\" name=\"executeBtn\" id=\"executeBtn\" style=\"margin-right: 10px;\">Execute</button></a>";	
+								echo "<button type=\"submit\" class=\"btn btn-info btn-lg\" name=\"executeSaveBtn\" id=\"executeSaveBtn\" style=\"margin-right: 10px;\">Save & Execute</button>";
+							}
+							?>
+							
+						<?php
+							//javascript: return confirm('Please confirm deletion');
+								if($cmd == "edit"){ 
+									echo "<a onclick=\"return confirm('Are you sure you want to delete?');\" href=\"script.php?cmd=delete&ID=$ID\">
+									<button type=\"button\" class=\"btn btn-danger btn-lg\">Delete</button></a>";
+								}
+							?>
+								<button type="button" onclick="window.history.back();" class="btn btn-info btn-lg" name="cancelBtn" id="cancelBtn" style="margin-right: 10px;">Cancel</button>
 						</form>
 					</div>
 				</article>
@@ -78,157 +192,11 @@
 	</div>
 	
 	<script>
-			//var filename = parseUrl();
-			var editor, filename, buttons;
-			$( document ).ready(function() {
+				var editor;
 				initCodeMirror();
-				filename = $('#mainForm input');
-				buttons = $('.buttons-row');
-			});
 	</script>
-	
-	<?php
-	if($cmd == "edit"){ ?>
-		<script>
-			$( document ).ready(function() {
-				
-				buttons.append('<button type="submit" class="btn btn-info btn-lg" name="create_new_script" id="save_btn" style="margin-right: 10px;">Save code</button>');
-				buttons.append('<button type="button" class="btn btn-danger btn-lg" id="delete_btn">Delete</button>');
-				buttons.append('<button type="button" class="btn btn-light btn-lg pull-right" style="border: 2px solid #CCCCCC;" id="cancel_btn" onclick="cancel();">Cancel</button>');
-				
-				//DELETE BUTTON AND DELETE EVENT
-				var delete_btn = $('#delete_btn');
-				
-				delete_btn.on("click", function(){
-					$.confirm({
-					    title: 'Delete file',
-					    content: 'Are you sure you want to delete: ' + filename.val() + ' ?',
-					    buttons: {
-					        confirm: function () {
-					        	
-						        var deleteStatus = function(output){
-						        	if(output == "success"){
-						        		location.replace("http://edu.robotic.bg/iliyan/interface/view_scripts.php?cmd=del&status=success");
-						        	}
-						        	else if(output == "error"){
-						        		location.replace("http://edu.robotic.bg/iliyan/interface/view_scripts.php?cmd=del&status=error");
-						        	}
-						        }
-						        
-						        ajax_delete("file_processing.php", filename.val()).done(deleteStatus);		
-					        	
-					        },
-					        cancel: function () {
-					        }
-					    }
-					});
-				});
-		 		
-		 		//FILENAME CHANGE EVENT
-		 		$('#mainForm input').change(function(){
-		 			$(this).closest('form').data('changed', true);
-		 		});
-		 		
-		 		//SUBMIT THE FORM
-		 		$('#mainForm').submit(function(e){
-		 			if($(this).data('changed')){
-		 				ajax_delete("file_processing.php", filename.val());
-		 			}
-		 		
-					e.preventDefault();
-					var value = editor.getValue();
-				
-					var editedStatus = function(output){
-						if(output == "error"){
-							$('#alerterror').show();
-						}
-						else if(output == "success"){
-							$('#alertsuccess').text("This script was edited successfully!");
-							$('#alertsuccess').show();
-						}
-					}
-					var newFileName = $('#mainForm input').val();
-					ajax_write("file_processing.php", newFileName, value).done(editedStatus);
-				});
-			});
-		</script>
-<?php		
-	}
-	else if($cmd == "create"){ ?>
-		<script>
-			$( document ).ready(function() {
-				buttons.append('<button type="submit" class="btn btn-info btn-lg" name="create_new_script" id="save_btn" style="margin-right: 10px;">Save code</button>');
-				buttons.append('<button type="button" class="btn btn-light btn-lg pull-right" style="border: 2px solid #CCCCCC;" id="cancel_btn" onclick="cancel();">Cancel</button>');
-				filename.attr("value", "");
-				editor.setValue("");
-				$('#cmdPostParam').attr("value", "create");
-			});
-		</script>
-<?php
-	}
-	else if($cmd == "execute"){ ?>
-		<script>
-			$( document ).ready(function() {
-				
-				//SET VALUE TO FILENAME FIELD
-				var filenameField = $('#script_name');
-				filenameField.prop("readonly", true);
-				
-				//var editor = $('.CodeMirror')[0].CodeMirror;
-				console.log(editor);
-				
-						
-				//SET FILE CONTENT AS A EDITOR VALUE
-				/*var url_cust = 'file_processing.php';
-				var data_cust = {action: 'read', filename: filename};
-				var succ_func = function(output){
-					editor.setValue(output);
-				};
-				
-				ajax_custom(url_cust, data_cust).done(succ_func);*/
-				//ajax_read("file_processing.php",filename, editor);
-				
-				//NO POINTER EVENTS OVER CODE MIRROR
-				var codeEditor = $('.CodeMirror');
-				codeEditor.css("pointer-events", "none");
-				
-				
-				//BUTTONS
-				buttons.append('<button type="button" class="btn btn-dark btn-lg" id="execute_btn" style="margin-right: 10px;">Execute</button>');
-				buttons.append('<button type="button" class="btn btn-info btn-lg" id="edit_btn">Edit Mode</button>');
-				buttons.append(' <button type="button" class="btn btn-light btn-lg pull-right" style="border: 2px solid #CCCCCC;" id="cancel_btn" onclick="cancel();">Cancel</button>');
-				
-				//IFRAME
-				$('#execute_btn').click(function(){
-					var url = "http://edu.robotic.bg/iliyan/interface/executed_script.php?filename=" + filename;
-					var iframe = "<iframe src=" + url + " style=\"width: 100%; height: 500px;\"></iframe>";
-					
-					$('.left-side>h4').replaceWith('<button type="button" class="btn btn-default navbar-btn pull-left goback">' +
-						'<i class="fas fa-chevron-left"></i></button>');
-						
-					$('.goback').click(function(){
-						window.history.go(-1);
-					});
-    				
-					$("form").hide();
-					$('.content-container').append(iframe);	
-				});
-				
-				//EDIT MODE
-				$('#edit_btn').click(function(){
-					console.log("editing mode out");
-					codeEditor.css("pointer-events", "auto");
-				});
-			});
-		</script>
-	<?php
+	<?php	}
+	if($cmd == "" || $cmd == "executeview"){
+		include 'view_scripts.php';
 	}
 ?>
-	<script>
-		function cancel(){
-			window.history.go(-1);	
-		}
-	</script>
-		
-	<!-- <div class="brand"><a href="#">MAIN MENU</a></div> -->
-<?php include 'footer.php'; ?>

@@ -1,4 +1,8 @@
 <?php
+	if(basename($_SERVER['PHP_SELF']) != 'signin.php' && basename($_SERVER['PHP_SELF']) != 'signup.php'){
+		include 'login.php';
+	}
+	
 	include 'config.php';
 ?>
 <!DOCTYPE html>
@@ -47,10 +51,21 @@
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 	
 	<!-- GALLERY PLUGIN-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Droid+Sans:400,700" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.8.1/baguetteBox.min.css">
-    <link rel="stylesheet" href="gallery-grid.css">
+	<link rel="stylesheet" href="css/baguetteBox.min.css">
+  <script src="js/baguetteBox.min.js" async></script>
+  
+    
+  <!-- Progressbar -->
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+   
+  <!-- Delete confirmation Modal
+  <script src="../load_files/bootbox/bootbox.min.js">
+  <script src="../load_files/bootbox/bootbox.locales.min.js"></script>
+ -->
 	<title>RoboAdmin</title>
  	
 </head>

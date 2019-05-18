@@ -1,4 +1,5 @@
 <?php
+	//include 'login.php';
 	include 'head.php';  
 	include 'navbar-top.php';
 	include 'nav-side-menu.php';
@@ -7,7 +8,7 @@
 	<script type="text/javascript">
 	
 	var ros = new ROSLIB.Ros({
-		url: 'ws://localhost:9090'
+		url: 'ws://<?=$site_ip?>:9090'
 	});
 
 	ros.on('connection', function(){
@@ -24,13 +25,13 @@
    
      var cmdVel = new ROSLIB.Topic({
        ros : ros,
-       name : '/cmd_vel_mux/input/teleop',
+       name : '/cmd_vel',
        messageType : 'geometry_msgs/Twist'
      });
    
      var twistLeft = new ROSLIB.Message({
        linear : {
-         x : 0.2,
+         x : 0.0,
          y : 0.0,
          z : 0.0
        },
@@ -43,7 +44,19 @@
 
      var forward = new ROSLIB.Message({
        linear : {
-         x : 0.5,
+         x : 0.1,
+         y : 0.0,
+         z : 0.0
+       },
+       angular : {
+         x : 0.0,
+         y : 0.0,
+         z : 0.0
+       }
+     });
+     var backward = new ROSLIB.Message({
+       linear : {
+         x : -0.1,
          y : 0.0,
          z : 0.0
        },
@@ -56,7 +69,7 @@
 
      var twistRight = new ROSLIB.Message({
        linear : {
-         x : 0.2,
+         x : 0.0,
          y : 0.0,
          z : 0.0
        },
@@ -81,26 +94,114 @@
        
     $( document ).ready(function() {
     	console.log( "ready!" );
-		$(document).bind('keypress', function(e){
-	       if(e.keyCode == 37){
+	      $( document ).bind('keydown', function(e){
+                                console.log("key: iiiimmmjkjjjj "+e.keyCode);
+                               
+
+	       if(e.keyCode == 74){
+                                console.log("left");
 		   		cmdVel.publish(twistLeft);
 		   		var leftKey = $('#left');
 		   		
 		   		leftKey.removeClass('bg-dark text-white');
 		   		leftKey.addClass('bg-light text-dark');	
 		   }
-		   else if(e.keyCode == 39){
+		   else if(e.keyCode == 75){
+                                console.log("right");
 		   		cmdVel.publish(twistRight);
 		   		$('#right').removeClass('bg-dark text-white');
 		   		$('#right').addClass('bg-light text-dark');
 		   }
-		   else if(e.keyCode == 38){
+		   else if(e.keyCode == 73){
+                                console.log("forward");
 		   		cmdVel.publish(forward);
 		   		$('#up').removeClass('bg-dark text-white');
 		   		$('#up').addClass('bg-light text-dark');
 		   }
+		   else if(e.keyCode == 77){
+                                console.log("backward");
+		   		cmdVel.publish(backward);
+		   		$('#down').removeClass('bg-dark text-white');
+		   		$('#down').addClass('bg-light text-dark');
+		   }
 	    });
 
+			var gamepadInfo = document.getElementById("gamepad-info");
+				var start;
+				var a = 0;
+				var b = 0;
+				var last_a_position=0;
+				var last_b_position=0;
+				var rAF = window.mozRequestAnimationFrame ||
+				  window.webkitRequestAnimationFrame ||
+				  window.requestAnimationFrame;
+				var rAFStop = window.mozCancelRequestAnimationFrame ||
+				  window.webkitCancelRequestAnimationFrame ||
+				  window.cancelRequestAnimationFrame;
+				window.addEventListener("gamepadconnected", function() {
+				  var gp = navigator.getGamepads()[0];
+				  gameLoop();
+				});
+				window.addEventListener("gamepaddisconnected", function() {
+				  gamepadInfo.innerHTML = "Waiting for gamepad.";
+				  rAFStop(start);
+				});
+				if(!('GamepadEvent' in window)) {
+				  // No gamepad events available, poll instead.
+				  var interval = setInterval(pollGamepads, 500);
+				}
+				function pollGamepads() {
+				  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+				  for (var i = 0; i < gamepads.length; i++) {
+				    var gp = gamepads[i];
+				    if(gp) {
+				      gamepadInfo.innerHTML = "Gamepad connected at index " + gp.index + ": " + gp.id + ". It has " + gp.buttons.length + " buttons and " + gp.axes.length + " axes.";
+				      gameLoop();
+				      clearInterval(interval);
+				    }
+				  }
+				}
+				function buttonPressed(b) {
+				  if (typeof(b) == "object") {
+				    return b.pressed;
+				  }
+				  return b == 1.0;
+				}
+				function gameLoop() {
+				  var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
+				  if (!gamepads)
+				    return;
+				  var gp = gamepads[0];
+				  if (buttonPressed(gp.buttons[0])) {
+				    b--; //gore
+				  } else if (buttonPressed(gp.buttons[2])) {
+				    b++; //dolu
+				  }
+				  if(buttonPressed(gp.buttons[1])) {
+				    a++; //dqsno
+				    
+				  } else if(buttonPressed(gp.buttons[3])) {
+				    a--; //lqvo
+				  }
+
+				  if(last_b_position < b){
+				 		 		cmdVel.publish(backward);
+				 	}
+				 	else if(last_b_position > b){
+				 		 		cmdVel.publish(forward);
+				 	}	
+				 	
+				 	if(last_a_position < a){
+				 		 		cmdVel.publish(twistRight);
+				 	}
+				 	else if(last_a_position > a){
+				 		 		cmdVel.publish(twistLeft);
+				 	}	
+
+				  last_a_position = a;
+				  last_b_position = b;
+				  var start = rAF(gameLoop);
+				}
     });       
 
 	</script>
@@ -119,6 +220,9 @@
 				</div>
 			</div>			
 		</div>
+		<div class="row">
+				<iframe width=410 height=306 style="border:none;transform: scaleY(-1);" src="http://<?=$site_ip?>:8080/stream?topic=/raspicam_node/image"></iframe>
+				</div>
 	</div>
 
 <?php	

@@ -16,12 +16,6 @@ html{
 	margin: 0px 15px;
 }
 
-#emg_stop{
-    width: 170px;
-    padding-left: 6px;
-    padding-right: 6px;
-}
-
 
 body{
 	width: 100%;
@@ -578,7 +572,7 @@ img.zoom {
 	margin: 15px;
 }
 
-.buttonImgShow{
+.buttonImgShow a{
   position: absolute;
   left: 32px;
   top: 140px;
@@ -587,7 +581,7 @@ img.zoom {
   transition: opacity .35s ease;
 }
 
-.buttonImgShow a {
+.buttonImgShow a, .buttonMusicPlay a, .buttonVideoPlay a {
   width: 200px;
   padding: 12px 48px;
   text-align: center;

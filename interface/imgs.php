@@ -1,24 +1,13 @@
 <?php 
-	//include 'login.php';
 	include 'head.php';
 	include 'navbar-top.php';
 	include 'nav-side-menu.php';
 	include 'db_con.php';
-	include 'func-robot.php';
-	
-	//Show Image on Robot
-	$ID = (int) $_GET['ID'];
-	$cmd = $_GET['cmd'];
-	if($cmd == "show" AND $ID > 0){	
-		show_image($ID);
-	}
 ?>
 <body>
 		<div class="container gallery-container col-lg-9">
 
-			<div class="tz-gallery">
-
-        	<div class="row images">
+			<div class="tz-gallery gallery">
 		
 			<?php 
 			$sql = "SELECT * FROM media_files";
@@ -28,26 +17,22 @@
 			<?php
 			}
 			else{
-				$sql = "SELECT * FROM media_files WHERE content_type=1";
+				$sql = "SELECT * FROM media_files";
 				$res = mysqli_query($conn, $sql);
 				while($row = mysqli_fetch_assoc($res)){
 					$dir = $media_sources."images/";
 					$imgPath = $root_dir."uploads/images/".$row['file_name'];
 					$imageSRC = $media_sources . "images/" . $row['file_name'];
 					if(file_exists($imgPath)){ ?>
-						<div class="col-sm-6 col-md-3 gallery">
 							  <a href="<?php echo $imageSRC;?>" class="lightbox">
-							 	  <img src="<?php echo $imageSRC;?>" class="gallery-images" alt="Image unavailable" name="<?php echo $row['file_name'];?>">  
+							 	  <img src="<?php echo $imageSRC;?>" class="gallery-images" alt="Image unavailable" name="<?php echo $image;?>">  
 								</a>
-								<div class="buttonImgShow"><a href="view_images.php?cmd=show&ID=<?php echo $row['ID']; ?>"> SHOW </a>
-						</div>
 					<?php 
 					} 
 					//echo $row['file_name'];
 			}
 		} ?>
 				
-				</div>
 			</div>
 		</div>
 	

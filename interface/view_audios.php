@@ -1,91 +1,81 @@
 <?php 
 	include 'head.php';
-	session_start();
+	include 'navbar-top.php';
+	include 'nav-side-menu.php';
+	include 'db_con.php';
+	include 'func-robot.php';
+	include 'config.php';
+	
+	//Play Music on Robot
+	$ID = (int) $_GET['ID'];
+	$cmd = $_GET['cmd'];
+	if($cmd == "play" AND $ID > 0){
+		$sql = "SELECT file_name FROM media_files WHERE ID='$ID'";
+		$res = mysqli_query($conn, $sql);
+		$result = mysqli_fetch_assoc($res);
+		$url = "http:".$media_sources."audios/".$result['file_name'];
+		echo $url;
+		play_media($url);
+	}
 ?>
 <body>
-	<?php 
-		include 'navbar-top.php';
-		include 'nav-side-menu.php';
-	?>
+		<div class="container gallery-container col-lg-9">
 
-	<?php
-		$dirPath = $upload_dir . "audios/";
-	?>
+			<div class="tz-gallery">
 
-		<div class="gallery-scripts-content">
+        	<div class="row images">
 		
-			<? 
-			if(is_dir_empty()){ ?>
-				<div><h1 class="no-files-found">No files found.</h1></div>
-
-				<?
+			<?php 
+			$sql = "SELECT * FROM media_files WHERE content_type=2";
+			$res = mysqli_query($conn, $sql);
+			if(mysqli_num_rows($res) == 0){ ?>
+				<div id="no-files-found"><h1 class="no-files-found">No files found.</h1></div>
+			<?php
 			}
 			else{
-					$dir = scandir($dirPath);
-					$dots = array(".", "..");
-					foreach($dir as $file){ 
-						if(!in_array($file, $dots)) {
-					?>
-							<div class="gallery-scripts">
-									<img src="https://img.icons8.com/color/1600/audio-file.png" class="audio-image" name="<?=$file?>"/>
-									<div class="script-name">
-										<?
+				$sql = "SELECT * FROM media_files WHERE content_type=2";
+				$res = mysqli_query($conn, $sql);
+				while($row = mysqli_fetch_assoc($res)){
+					$dir = $media_sources."audios/";
+					$musicPath = $root_dir."uploads/audios/".$row['file_name'];
+					$musicSRC = $media_sources . "audios/" . $row['file_name'];
+					if(file_exists($musicPath)){ ?>
+						<div class="gallery-scripts">
+							  <a href="<?php echo $musicSRC;?>">
+							 	  <img src="audio-file.png" class="audio-image" alt="Audio unavailable" name="<?php echo $row['file_name'];?>">
+							 	  <div class="script-name">
+										<?php 
+											$file = $row['file_name'];
 											if(strlen($file) - getExtension($file) > 10) {
 												$subFileName = substr($file, 0, 10);
 												echo $subFileName . "." . getExtension($file);
 											} 
 										?>
-									</div>
-								    <div class="modal music">
-										<span class="close1">&times;</span>
-										<video controls name="media" id="music">
-											<source src="http://edu.robotic.bg/iliyan/uploads/audios/<?=$file?>" type="audio/mpeg" id="source">
-										</video>
-									</div>
-							</div>
-							
-					<? 
-						}
-					}
-					 
-				} ?>
+									</div>  
+								</a>
+								<div class="buttonMusicPlay" style="text-align:center;"><a href="view_audios.php?cmd=play&ID=<?php echo $row['ID'];?>" style="color: black;text-decoration:none;display:inline-block;"> PLAY </a>
+						</div>
+					<?php 
+					} 
+			}
+		} ?>
+				
+				</div>
+			</div>
 		</div>
 
-		<div class="uploader">
-			<form id="upload_file" enctype="multipart/form-data">
-				<input type="file" name="file" />
-				<input type="submit" name="submit" value="Upload" /> 
+		<div class="uploader" style="display: none;">
+			<form id="upload_file" enctype="multipart/form-data" method="post" action="uploader.php">
+				<input type="file" name="file" id="fileInput" />
 				<input type="hidden" name="type" value="2" /> 
-				<br /> 
-				<b id="file_upload_status"> 
-				</b>
 			</form>
 		</div>
 
 <?php
-	function is_dir_empty(){
-		global $dirPath;
-
-		$dir = scandir($dirPath);
-		$dots = array(".", "..");
-		$i=0;
-		foreach($dir as $file){
-			if(!in_array($file, $dots))
-			$i++;
-		}
-
-		if($i==0) return true;
-		return false;
-	}
-	
-	function getAudioName($fileName){
-		$nameToArray = explode('.', $fileName);
-		return $nameToArray[0];
-	}
-	
 	function getExtension($fileName){
 		$nameToArray = explode('.', $fileName);
 		return end($nameToArray);
 	}
+	include 'footer.php';
+	mysqli_close($conn);
 ?>
-<?php include 'footer.php';?>

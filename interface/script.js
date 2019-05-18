@@ -1,7 +1,7 @@
-	 $( document ).ready(function() {
+$( document ).ready(function() {
 	 	
-	 	var toggleButton = $('button');
-	toggleButton.on('click', function(){
+	 	var toggleButton = $('#toggle-nav-btn');
+		toggleButton.on('click', function(){
 		if(toggleButton.hasClass('visible_pre')){
 			//$("#navbarNav2").css("display", "block");
 			$("#navbarNav2").slideDown();
@@ -43,7 +43,23 @@
     });
 	 	
 	 	console.log("running");
-
+	/*$('.buttonImgShow').click(function(){
+		$.ajax({
+			url: "showImg.php",
+			type: 'post',
+			data: {"name": $(this).prev().find('img').attr('name')},
+			success: function(output){
+				console.log("Image showed: " + output);
+			}
+		});
+	});*/
+	//$('#executeSaveBtn').click(
+	//	function(){
+	//		$('#mainForm').submit();
+	//		console.log("clicked");	
+	//	}
+	//);
+});
 	 // MODALS
 			//var musicModal = $(".modal.music");
 			/*var musicModal = "";
@@ -70,7 +86,7 @@
 			});*/
 
 		//UPLOAD A MEDIA FILE
-			$('#upload_file').submit(function(e){
+		/*	$('#upload_file').submit(function(e){
 				var myForm = new FormData(this);
 				e.preventDefault();
 				$.ajax({
@@ -80,23 +96,122 @@
 					processData: false,
 					contentType: false,
 					success: function(output){
-						if(output.length > 0){
-							var res = output.split(',');
-							var urlParams = res[0].split('/');
-							//alert(output);
-							$("#file_upload_status").text(res[1]);
-							
-							if($('.no-files-found').is(':visible')) $('.no-files-found').hide();
+						console.log(output);
+						if(output){
+							var data = JSON.parse(output);
 							$('.images').append(
-								'<div class="col-sm-6 col-md-4">  <a href="' + res[0] + '" class="lightbox">'
-								 + '<img src="' + res[0] + '" class="gallery-images" alt="Image unavailable" name="' + urlParams[urlParams.length - 1] + '"> </a> </div>');
+								'<div class="col-sm-6 col-md-4">  <a href="' + data.url + '" class="lightbox">'
+								 + '<img src="' + data.url + '" class="gallery-images" alt="Image unavailable" name="' + data.msg + '"> </a> </div>');
 						}
 					}
 				});
 
-			});
-    });
+			});*/
+			
+  /*$('#formLogin').submit(function(e){
+		e.preventDefault();
+	 	
+	 	var formData = $('#formLogin').serialize();
+		$.ajax({
+			url: "login.php",
+			data: formData,
+			type: 'post',
+			success: function(output){
+				var jsonObject = JSON.parse(output);
+				if(jsonObject.error != ""){
+					console.log("ERROR");
+					location.href = "http://edu.robotic.bg/iliyan/interface/signin.php?error=" + jsonObject.error;
+				}
+				else{
+					console.log("shto ne redirectvash be");
+					location.href = "http://edu.robotic.bg/iliyan/interface/index.php";
+				}
+			}
+		});
+	});*/
+	
+  /*$('#formRegister').submit(function(e){
+  	console.log("submitted");
+		e.preventDefault();
+	 	
+	 	var formData = $('#formRegister').serialize();
+
+		$.ajax({
+			url: "register.php",
+			data: formData,
+			type: 'post',
+			dataType: 'json',
+			success: function(output){
+				var jsonObject = JSON.parse(output);
+				if(jsonObject.error != ""){
+					window.location = "http://edu.robotic.bg/iliyan/interface/signup.php?error=" + jsonObject.error;
+				}
+				else{
+					window.location = "http://edu.robotic.bg/iliyan/interface/signin.php?signup=success";
+				}
+			}
+		})
+	});*/
+	
+	/*$('.logout').click(function(e){
+		e.preventDefault(); 
+		$.ajax({
+			url: "logout.php",
+			success: function(output){
+				if(output == "success"){
+					location.href="signin.php?loggedOut=success";
+				}
+				else{
+					location.href="index.php?loggedOut=error";
+				}
+			}
+		}); 
+		
+		//return false; 
+	}); */
+	
+/*	$(".gallery img").mouseover(
+		function(){
+			console.log("mouserover");
+			$(".gallery img").popover({
+        placement: 'bottom',
+        html: 'true',
+        title : '<span class="text-info"><strong>title</strong></span>'+
+                '<button type="button" id="close" class="close" onclick="$(&quot;#example&quot;).popover(&quot;hide&quot;);">&times;</button>',
+        content : 'test'
+    	});
+		}
+	);
+	$(".gallery img").popover({
+        placement: 'bottom',
+        html: 'true',
+        title : '<span class="text-info"><strong>title</strong></span>'+
+                '<button type="button" id="close" class="close" onclick="$(&quot;#example&quot;).popover(&quot;hide&quot;);">&times;</button>',
+        content : 'test'
+    	});
+	
+	
+});*/
     
+/*function deleteConfirm(){
+	var deleteFlag = false;
+	bootbox.confirm({
+	   title: "Delete Confirmation",
+	   message: "Are you sure you want to selete this script?",
+		  buttons: {
+		      cancel: {
+		          label: '<i class="fa fa-times"></i> Cancel'
+		      },
+		      confirm: {
+		          label: '<i class="fa fa-check"></i> Confirm'
+		      }
+		  },
+		  callback: function (result) {
+		  		deleteFlag = result;
+		  }
+  });*/
+  //	return confirm('Please confirm deletion');
+
     //AJAX FUNCTIONS
     
     /*function ajax_read(url_cust, filename_cust, editor){
@@ -110,39 +225,39 @@
 		});
     }*/
     
-    function ajax_write(url_cust, filename_cust, value){
+   /* function ajax_write(url_cust, filename_cust, value){
     	return $.ajax({
-			url: url_cust,
-		    data: {action: 'write', filename: filename_cust, code: value},
-			type: 'post'
-		});
+				url: url_cust,
+		  	data: {action: 'write', filename: filename_cust, code: value},
+				type: 'post'
+			});
     }
     
     function ajax_delete(url_cust, filename_cust){
     	return $.ajax({
 			url: url_cust,
 		    data: {action: 'delete', filename: filename_cust},
-			type: 'post'
-		});
-    }
-    
-    //Parse URL
-    function parseUrl(){
-		var filename="";
-		var fullURL = window.location.search.substring(1);
-		var parameters = fullURL.split("&");
-		for(var i = 0; i<parameters.length;i++){
-			var currParam = parameters[i].split("=");
-			if(currParam[0] == "filename") filename = currParam[1];
-		}
-		return filename;
-    }
+				type: 'post'
+			});
+    }*/
     
     function subName(name){
     	if(name.length > 10){
     		return name.substr(0, 10) + '.' + name.split('.').pop();
     	}
     }
+    
+    function cancel(){
+			window.history.go(-1);	
+		}
+		
+		
+		function browse() {
+      $("#fileInput").click();
+      $("#fileInput").change(function(){
+      	$("#upload_file").submit();
+      });
+   }
 
 	// CREATE CODEMIRROR INSTANCE
 	function initCodeMirror(){
@@ -150,8 +265,24 @@
 			mode: "text/x-php",
 			theme: "rubyblue",
 			lineNumbers: true,
-			autoCloseTags: true,
-			//autofocus: true,
 			matchBrackets: true
 		});
 	}
+	
+  //Client-Side password validation
+	
+	/*function validate_pass(){
+		console.log("tuka sme")
+		var reg_pass = document.getElementById("reg_pass");
+		var reg_pass_confirm = document.getElementById("reg_pass_confirm");
+		
+		if(reg_pass.value != reg_pass_confirm.value){
+			 reg_pass_confirm.setCustomValidity("Passwords Don't Match");
+			 console.log("error");
+		}
+		else{
+			reg_pass_confirm.setCustomValidity("");
+			 console.log("success");
+		}
+	}*/
+	

@@ -1,5 +1,5 @@
 <div class="wrapper">
-		<div class="row">
+		<div class="main row">
 			<aside>
 				<div id="sidebar" class="d-none d-lg-block">
 					<div class="sidebar-brand"><p>MAIN MENU</p></div>
@@ -17,8 +17,8 @@
 			                   	</a>
 			                </li>
 			                <ul class="sub-menu" id="products">
-				                <li><a href="view_scripts.php">View Scripts</a></li> <!-- class="active" -->
-				                <li><a href="view_scripts.php?cmd=execute">Execute Script</a></li>
+				                <li><a href="script.php">View Scripts</a></li> <!-- class="active" -->
+				                <li><a href="script.php?cmd=executeview">Execute Script</a></li>
 				                <li><a href="script.php?cmd=create">Create New Script</a></li>
 			                </ul>
 
@@ -32,15 +32,10 @@
 			                </ul>	                 
 
 			                <li>
-			                  	<a href="#" class="sidebar-link clickable panel-collapsed notclicked">
+			                  <a href="#" class="sidebar-link clickable panel-collapsed notclicked">
 			                		<i class="fas fa-cog"></i> Settings
-			                    </a>
+			                  </a>
 			                </li>
-			                <ul class="sub-menu" id="service">
-			                    <li><a href="#">Images</a></li>
-				                <li><a href="#">Video Files</a></li>
-				                <li><a href="#">Audio Files</a></li>
-				            </ul>
 				                
 				            <li>
 			                  	<a href="manual_control.php" class="sidebar-link">
