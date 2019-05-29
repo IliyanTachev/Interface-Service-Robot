@@ -42,8 +42,8 @@
 				$sql = "UPDATE operators SET cookie='$setRandCookie', last_login_date=NOW()  WHERE ID='$resultRow[ID]'";
 				mysqli_query($conn, $sql);
 				setcookie("userID", $setRandCookie, time() + 3600);
-				$flag = true;
-				header("Location: $_SERVER[$PHP_SELF]");
+				header("Location: $_SERVER[PHP_SELF]");
+				exit;
 			}
 			else {
 				header("Location: " . "signin.php?error=invalidCredentials");
@@ -60,9 +60,7 @@
 	}
 							
 	if(!user_logged()) {
-		if($flag)
-			header("Location: " . "signin.php?flag=true/$_COOKIE[userID]/");
-		else header("Location: " . "signin.php?flag=false");
+		header("Location: " . "signin.php");
 		exit;
 	}
 	

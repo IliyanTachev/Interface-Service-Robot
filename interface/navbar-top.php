@@ -40,22 +40,25 @@
 		      </li>
 		      
 		      <li class="nav-item dropdown">
-		        <a class="nav-link dropdown-toggle" href="#" style="color: white;" data-toggle="dropdown" id="navbarDropdown">Robot Scripts</a>
-		        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		          <a class="dropdown-item" href="script.sphp">View Scripts</a>
-		          <a class="dropdown-item" href="script.php?cmd=execute">Execute script</a>
-				  <a class="dropdown-item" href="script.php?cmd=create">Create new script</a>
-		        </div>
+		        <a class="nav-link dropdown-toggle dropdown-btn-scripts" href="#" style="color: white;" data-toggle="dropdown" data-ul="scripts">Robot Scripts</a>
 		      </li>
+		      <ul style="display: none;" class="ul-scripts-dropdown" data-name="scripts">
+		      	<li><a class="dropdown-item" href="script.php">View Scripts</a></li>
+		      	<li><a class="dropdown-item" href="script.php?cmd=execute">Execute script</a></li>
+		      	<li> <a class="dropdown-item" href="script.php?cmd=create">Create new script</a></li>
+		      </ul>
 		      
-		      <li class="nav-item">
-		       <a class="nav-link" href="#" style="color: white;">Media Files</a>
-			      	<li><a href="view_images.php">Images</a></li>
-				    <li><a href="view_audios.php">Audio Files</a></li>
-				    <li><a href="view_videos.php">Video Files</a></li>
+		      
+		      <li class="nav-item dropdown">
+		        <a class="nav-link dropdown-toggle dropdown-btn-scripts" href="#" style="color: white;" data-toggle="dropdown" data-ul="media">Media files</a>
 		      </li>
+		      <ul style="display: none;" class="ul-scripts-dropdown" data-name="media">
+		      	<li><a class="dropdown-item" href="view_images.php">Images</a></li>
+		      	<li><a class="dropdown-item" href="view_audios.php">Audio Files</a></li>
+		      	<li> <a class="dropdown-item" href="view_videos.php">Video Files</a></li>
+		      </ul>
 		       <li class="nav-item">
-		        <a class="nav-link" href="#" style="color: white;">Manual Control</a>
+		        <a class="nav-link" href="manual_control.php" style="color: white;">Manual Control</a>
 		      </li>
 		       <li class="nav-item">
 		       <a class="nav-link" href="#" style="color: white;">Settings</a>
@@ -64,14 +67,19 @@
 			      	<a href="login.php?cmd=logout"><i class="fas fa-sign-out-alt logout-icon" style="font-size: 24px;"></i></a>
 			        <!--<a class="nav-link logout" href="#" style="color: white;">Logout</a>-->
 			      </li>
-			      <!-- <li class="nav-link">
-				   		<a href="#" class="btn btn-danger"><i class="fa fa-power-off system-icons"></i><p>Emergency Stop</p></a>
-			      </li> -->
 			    </ul>
 			  </div>
 
 			</nav>
 	</header>
+	<script>
+		$(document).ready(function(){
+			$(".dropdown-btn-scripts").click(function(){
+				var data = $(this).attr("data-ul");
+				$(`ul[data-name='${data}']`).toggle("slow");
+			});
+		});
+	</script>
 
 <?php
 		function getURLPage(){

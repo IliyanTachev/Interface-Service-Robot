@@ -10,7 +10,6 @@ else if($_POST['func'] == "move"){
 	move($lin_speed);
 }
 
-
 function emergency_stop(){
 	$cmd = "pidof omxplayer.bin";
 	$result = exec($cmd);
@@ -105,42 +104,31 @@ function show_image($ID, $apect="stretch")
 function display_ctl($switch=1)
 {
   global $debug;
-  if ($switch==0)  $cmd="sudo /var/www/html/libs/disp_off.sh";
-  else             $cmd="sudo /var/www/html/libs/disp_on.sh";
+  if ($switch==0) $cmd="sudo /var/www/html/libs/disp_off.sh";
+  else $cmd="sudo /var/www/html/libs/disp_on.sh";
   shell_exec($cmd);
   if ($debug) echo($cmd);
 }
 
-function move($x, $y, $angle)
+function move($lin_speed, $angle_speed)
 {
-				global $debug;
-        $x=(float)$x;
-        $y=(float)$y;
-        $angle=(float)$angle;
-        
-        $cmd="sudo python /var/www/html/libs/bebot_go.py $x $y $angle";
-        echo $cmd;
-        $msg = exec($cmd);
-				if ($debug) echo $cmd;
-				var_dump($msg);
-							//$lin_speed = -1.0;
- //echo("/home/pi/ros.sh rostopic pub /cmd_vel geometry_msgs/Twist '{linear: {x: ".(float)$lin_speed.", y: 0, z: 0}, angular: {x: 0, y: 0, z: 
-	//$res = exec("/home/pi/ros.sh rostopic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: ".(float)$lin_speed.", y: 0, z: 0}, angular: {x: 0, y: 0, z: ".(float)$ang_speed."}}'");
-	//echo "rostopic pub -1 /cmd_vel geometry_msgs/Twist 'linear: {x: ".(float)$lin_speed.", y: 0, z: 0}'";
-	//$tmp = "sudo rostopic pub -1 /cmd_vel geometry_msgs/Twist 'linear: {x: ".(float)$lin_speed.", y: 0, z: 0}";
-	//echo $tmp . " ";
-	//shell_exec("screen");
+	global $debug;
+  $x=(float)$x;
+  $y=(float)$y;
+  $angle=(float)$angle;
+     
+  $cmd = "sudo /home/pi/ros.sh python /var/www/html/libs/run.py $lin_speed $angle_speed";
+  $msg = exec($cmd);
+	if ($debug) echo $cmd;
 	
-	$ang_speed = 0;
-	//$res = exec("/home/pi/ros.sh rostopic pub -1 /cmd_vel geometry_msgs/Twist 'linear: {x: 0, y: 0, z: 0}'");
-//	exec("/home/pi/ros.sh rostopic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0}}'");
 	echo $res;
 }
 
-function move2()
-{
-	$res = exec("sudo /home/pi/ros.sh rostopic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.5}}'");
-	var_dump($res);
+function move_base($offset){
+	move($offset, 0);
 }
-//bash.rc
+
+function rotate_base($angle){
+	move(0, $angle);
+}
 ?>

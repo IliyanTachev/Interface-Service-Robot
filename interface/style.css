@@ -171,8 +171,13 @@ ul, li{
     background-color: white;
 }
 
-@media screen and (min-width: 992px) {
-	.content{
+@media screen and (max-width: 991px) {
+	.contentGallery{
+		left: 0px;
+		margin: 0 auto;
+		text-align: center;
+	}
+	/*.content{
 		left: 235px;
 	}
 	.col-lg-9{
@@ -180,8 +185,15 @@ ul, li{
     position: relative;
     flex: 0 0 80%;
     max-width: 80%;
+	}*/
+}
+
+@media screen and (min-width: 991px){
+	.contentGallery{
+		left: 260px;
 	}
 }
+
 
 label{
 	font-size: 1.25em;
@@ -602,4 +614,49 @@ img.zoom {
 
 .logout-icon:hover{
 	cursor: pointer;
+}
+
+//----------------------------------------- GALLERYYYY -------------------------------------
+.contentGallery {
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+.galleryImgs:after {
+    content: '';
+    display: block;
+    height: 2px;
+    margin: .5em 0 1.4em;
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0) 0%, rgba(77,77,77,1) 50%, rgba(0, 0, 0, 0) 100%);
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(77,77,77,1) 50%, rgba(0, 0, 0, 0) 100%);
+}
+
+.galleryImgs img {
+    height: 100%;
+}
+
+.galleryImgs a {
+    width: 240px;
+    height: 180px;
+    display: inline-block;
+    overflow: hidden;
+    margin: 4px 6px;
+    box-shadow: 0 0 4px -1px #000;
+}
+
+.ribbon > img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+}
+
+@media (max-width: 768px) {
+    .sm-hidden {
+        display: none;
+    }
+}
+
+.lightbox{
+	margin-left: 3px;
 }
