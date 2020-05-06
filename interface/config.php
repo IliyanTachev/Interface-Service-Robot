@@ -1,6 +1,4 @@
 <?php
-	//$site_url = "http://edu.robotic.bg/iliyan/";
-	//$root_dir = "/usr/hosting/robotic-bg/edu.robotic.bg/iliyan/";
 	$site_ip = "10.10.10.10";
   //$site_ip = "192.168.1.120";
 	$site_url = "//".$site_ip."/";
